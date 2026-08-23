@@ -1,0 +1,20 @@
+{
+  "name": "feishu-clipper",
+  "version": "1.0.0",
+  "description": "Clip web pages into Feishu wiki with auto-generated reading notes and original text",
+  "keywords": ["feishu", "lark", "wiki", "web-clipper", "qoder-skill", "reading-notes"],
+  "author": "bailynlove",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bailynlove/feishu-clipper-skill.git"
+  },
+  "files": [
+    "SKILL.md",
+    "config.yaml.example",
+    "references/"
+  ],
+  "scripts": {
+    "postinstall": "echo 'Link to ~/.qoder-cn/skills/feishu-clipper to activate'"
+  }
+}
