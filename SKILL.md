@@ -1,6 +1,6 @@
 ---
 name: feishu-clipper
-description: "Clip web pages or articles into Feishu wiki with reading notes and original text. Use when user shares a URL and wants it saved to a Feishu knowledge base (wiki). Supports X/Twitter articles, general web pages, and Chinese platforms. Default save location is 'Area' wiki space; user can specify another space name. Triggers: user shares a URL and says 'clip', 'save to feishu', '写入飞书', '剪藏', '收藏到知识库', or wants to archive a web page into their wiki with notes."
+description: "Clip web pages, articles, or videos into Feishu wiki with reading notes and original text/transcript. Use when user shares a URL and wants it saved to a Feishu knowledge base (wiki). Supports X/Twitter articles, general web pages, Chinese platforms, and YouTube/Bilibili video transcripts. Default save location is 'Area' wiki space; user can specify another space name. Triggers: user shares a URL and says 'clip', 'save to feishu', '写入飞书', '剪藏', '收藏到知识库', or wants to archive a web page or video into their wiki with notes."
 ---
 
 # Feishu Clipper
@@ -64,13 +64,47 @@ notes_language: "zh"           # 笔记语言
 
 **通用降级**：WebSearch 搜索原文标题 + 关键词，从转载源获取完整内容。
 
+**视频链接**（YouTube / Bilibili）— 提取字幕/转录作为原文：
+
+检测到 `youtube.com`、`youtu.be`、`bilibili.com`、`b23.tv` 域名时，走视频转录流程而非普通网页抓取。
+
+YouTube 字幕提取（按序重试，拿到内容即停）：
+```bash
+# 1. yt-dlp 下载字幕（需代理）
+yt-dlp --write-sub --write-auto-sub --sub-lang "zh-Hans,zh,en" \
+  --skip-download -o "/tmp/%(id)s" "URL"
+# 读取生成的 .vtt 文件，去除时间轴只保留文本
+
+# 2. yt-dlp 失败时，用 agent-reach transcribe 兜底（下载音频 + Whisper 转写）
+agent-reach transcribe "URL"
+```
+
+Bilibili 字幕提取：
+```bash
+# 1. 获取视频元数据（确认字幕可用性）
+bili video BVxxx
+
+# 2. 提取字幕（需 OpenCLI + 桌面 Chrome）
+opencli bilibili subtitle BVxxx
+
+# 3. 无字幕时，下载音频再转写
+bili audio BVxxx
+agent-reach transcribe /tmp/音频文件路径
+```
+
+转录文本处理：
+- 去除时间轴标记，只保留纯文本
+- 合并重复行（自动字幕常有行间重复）
+- 按语义分段，每段不超过 2000 字（适配飞书文档写入限制）
+- 在文档"原文"section 标注来源为视频转录，附视频链接和时长信息
+
 ### 2. 生成阅读笔记
 
-基于抓取内容撰写笔记，包含：
+基于抓取内容撰写笔记。如果是视频转录，额外关注视频特有的信息（演示、代码展示、屏幕操作等）。笔记包含：
 
-- **背景与动机**：作者是谁、何时发布、为什么写这篇
+- **背景与动机**：作者/UP主是谁、何时发布、为什么做这个内容
 - **核心观点**：1-2 句话总结
-- **要点详解**：按原文结构逐点展开分析
+- **要点详解**：按内容结构逐点展开分析（视频按时间线或主题分段）
 - **个人思考**：对内容的独立评价和延伸思考
 
 笔记用中文撰写，保持分析深度，不是简单复述。
