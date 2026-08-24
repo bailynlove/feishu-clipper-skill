@@ -1,0 +1,3 @@
+interface:
+  display_name: "Feishu Clipper"
+  short_description: "Clip web pages and videos into Feishu wiki with reading notes"
