@@ -11,19 +11,12 @@ A Qoder CLI skill that clips web pages and articles into Feishu (Lark) wiki with
 
 ## Installation
 
-### As a Qoder CLI skill
-
 ```bash
-# Clone to your skills directory
-git clone https://github.com/bailynlove/feishu-clipper-skill.git ~/.qoder-cn/skills/feishu-clipper
-```
+# From GitHub (recommended)
+qodercn skills install https://github.com/bailynlove/feishu-clipper-skill
 
-### Via npm (global install)
-
-```bash
-npm install -g feishu-clipper
-# Then link to your skills directory
-ln -s $(npm root -g)/feishu-clipper ~/.qoder-cn/skills/feishu-clipper
+# Or link from local path (for development)
+qodercn skills link /path/to/feishu-clipper-skill
 ```
 
 ## Configuration
